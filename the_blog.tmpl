@@ -6,12 +6,9 @@
 </head>
 <body>
 
-
-     <h1 id="about-that">About That</h1>
-
-<p>A blog about that, but that can be anything.</p>
-
-
+{{range $post := .}}
+     {{$post.Content}}
+{{end}}
 
 </body>
 </html>
