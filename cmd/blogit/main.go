@@ -1,6 +1,7 @@
 package main
 
 import (
+    "slices"
 	"os"
     "html/template"
 
@@ -44,5 +45,6 @@ func main() {
 
     indexFile, _ := os.Create("index.html")
 
+    slices.Reverse(allPosts)
     template.Execute(indexFile, allPosts)
 }
