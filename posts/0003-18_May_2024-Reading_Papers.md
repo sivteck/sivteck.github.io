@@ -1,5 +1,5 @@
-About Rules for Reading Papers
-==============================
+Rules for Reading Papers
+========================
 
 1. Pick Your Reading Goal
 2. Understand the Author's Goal
@@ -18,6 +18,6 @@ About Rules for Reading Papers
 9. Talk about it
 10. Build on it.
 
-All the rules are taken from [0]. All credits go to the original authors.
+All the rules are taken from [0]. All credits belongs to the original authors.
 
 [0] Carey MA, Steiner KL, Petri WA Jr (2020) Ten simple rules for reading a scientific paper. PLoS Comput Biol 16(7): e1008032. [https://doi.org/10.1371/journal.pcbi.1008032]()
