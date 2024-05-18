@@ -32,25 +32,41 @@ The components of a papers
 --------------------------
 
 5. Tell a complete story in the abstract.
+
     The one question is (context)
+
     Here we do (content)
+
     What we found (content)
+
     How it matters (conclusion)
 6. Get across why the paper matters in the introduction.
     Big problem in science     | -> Field domain
+
     Narrower Problem Within    |    what field knows 
+
     Yet narrower paper Gap     |    remaining gap 
+
     Summary                    -> Our Approach and Our Results
+
 7. Communicate the results as a sequence of statements that build on one another to support the central contribution.
     Methods Summary
+
     Logic 1 (e.g. Raw Data)         | -> To answer our questions, General methods
+
     Logic 2 (e.g. Processed)        | Figures tell whole story
+
     Logic n (e.g. final statistics) | -> The current question, How we asked it, The answer
+
 8. Discuss how the gap was filled, the limitations of the interpretations, and relevance to the field.
     Results -> Conclusion           | we found, we filled a gap
+
     Limitations in filling gap      | -> Limitations, Details
+
     Limits in generalization        | How to interpret / fix
+
     Contributions beyond            | -> Strength, What it is useful for
+
     Science is better now           | The difference made
 
 
