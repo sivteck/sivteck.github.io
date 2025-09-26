@@ -3,19 +3,19 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <title>Blog Title</title>
   <subtitle>This is a longer description about your blog.</subtitle>
-  <link href="https://example.com/feed/feed.xml" rel="self" />
-  <link href="https://example.com/" />
-  <updated>2026-09-26T00:00:00Z</updated>
-  <id>https://example.com/</id>
+  <link href="https://example.com/sivteck.github.io/feed/feed.xml" rel="self" />
+  <link href="https://example.com/sivteck.github.io/" />
+  <updated>2025-09-26T00:00:00Z</updated>
+  <id>https://example.com/sivteck.github.io/</id>
   <author>
     <name>Your Name</name>
   </author>
   <entry>
-    <title>New Blog.</title>
-    <link href="https://example.com/blog/firstpost/" />
-    <updated>2026-09-26T00:00:00Z</updated>
-    <id>https://example.com/blog/firstpost/</id>
-    <content type="html">&lt;p&gt;I am using the eleventy starter blog template for this. Hoping to blog regularly.&lt;/p&gt;
+    <title>First post.</title>
+    <link href="https://example.com/sivteck.github.io/blog/firstpost/" />
+    <updated>2025-09-26T00:00:00Z</updated>
+    <id>https://example.com/sivteck.github.io/blog/firstpost/</id>
+    <content type="html">&lt;p&gt;Starting a new Blog.&lt;/p&gt;
 </content>
   </entry>
 </feed>
