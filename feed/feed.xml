@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="pretty-atom-feed.xsl" type="text/xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <title>Blog Title</title>
+  <subtitle>This is a longer description about your blog.</subtitle>
+  <link href="https://example.com/feed/feed.xml" rel="self" />
+  <link href="https://example.com/" />
+  <updated>2026-09-26T00:00:00Z</updated>
+  <id>https://example.com/</id>
+  <author>
+    <name>Your Name</name>
+  </author>
+  <entry>
+    <title>New Blog.</title>
+    <link href="https://example.com/blog/firstpost/" />
+    <updated>2026-09-26T00:00:00Z</updated>
+    <id>https://example.com/blog/firstpost/</id>
+    <content type="html">&lt;p&gt;I am using the eleventy starter blog template for this. Hoping to blog regularly.&lt;/p&gt;
+</content>
+  </entry>
+</feed>
