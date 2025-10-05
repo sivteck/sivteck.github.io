@@ -3,8 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>sivteck</title>
-		<meta name="description" content="Blog">
+		<title>CUDA Basic Indexing</title>
+		<meta name="description" content="Understanding one dimensional indexes">
 		<link rel="alternate" href="/feed/feed.xml" type="application/atom+xml" title="sivteck">
 		
 		
@@ -306,6 +306,174 @@ header {
 }
 .post-metadata time {
 	margin-right: 1em;
+}
+/**
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	color: #f8f8f2;
+	background: none;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size: 1em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+	border-radius: 0.3em;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #272822;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #8292a2;
+}
+
+.token.punctuation {
+	color: #f8f8f2;
+}
+
+.token.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+	color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+	color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+	color: #e6db74;
+}
+
+.token.keyword {
+	color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+	color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+/*
+ * New diff- syntax
+ */
+
+pre[class*="language-diff-"] {
+	--eleventy-code-padding: 1.25em;
+	padding-left: var(--eleventy-code-padding);
+	padding-right: var(--eleventy-code-padding);
+}
+.token.deleted {
+	background-color: hsl(0, 51%, 37%);
+	color: inherit;
+}
+.token.inserted {
+	background-color: hsl(126, 31%, 39%);
+	color: inherit;
+}
+
+/* Make the + and - characters unselectable for copy/paste */
+.token.prefix.unchanged,
+.token.prefix.inserted,
+.token.prefix.deleted {
+	-webkit-user-select: none;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.token.prefix.inserted,
+.token.prefix.deleted {
+	width: var(--eleventy-code-padding);
+	background-color: rgba(0,0,0,.2);
+}
+
+/* Optional: full-width background color */
+.token.inserted:not(.prefix),
+.token.deleted:not(.prefix) {
+	display: block;
+	margin-left: calc(-1 * var(--eleventy-code-padding));
+	margin-right: calc(-1 * var(--eleventy-code-padding));
+	text-decoration: none; /* override del, ins, mark defaults */
+	color: inherit; /* override del, ins, mark defaults */
 }</style>
 		
 	</head>
@@ -317,7 +485,7 @@ header {
 			<nav>
 				<h2 class="visually-hidden" id="top-level-navigation-menu">Top level navigation menu</h2>
 				<ul class="nav">
-					<li class="nav-item"><a href="/" aria-current="page">Home</a></li>
+					<li class="nav-item"><a href="/">Home</a></li>
 					<li class="nav-item"><a href="/blog/">Archive</a></li>
 					<li class="nav-item"><a href="/about/">About</a></li>
 					<li class="nav-item"><a href="/feed/feed.xml">Feed</a></li>
@@ -330,28 +498,81 @@ header {
 				
 
 
-<h1 id="latest-2-posts">Latest 2 Posts</h1>
+<h1 id="cuda-basic-indexing">CUDA Basic Indexing</h1>
 
+<ul class="post-metadata">
+	<li><time datetime="2025-10-05">05 October 2025</time></li>
+	<li><a href="/tags/dev/" class="post-tag">dev</a></li>
+</ul>
 
+<p>Basic CUDA examples to understand indexing.</p>
+<p>One Block, Ten Threads:</p>
+<pre class="language-c++" tabindex="0"><code class="language-c++">#include <iostream>
+__device__ void foo(int i, int j, int* rGPU) {
+    rGPU[i + j] = i + j;
+}
 
-<ol reversed="" class="postlist" style="--postlist-index: 3">
-	<li class="postlist-item">
-		<a href="/blog/03-cuda-builtin-vars/" class="postlist-link">CUDA Basic Indexing</a>
-		<time class="postlist-date" datetime="2025-10-05">October 2025</time>
-	</li>
-	<li class="postlist-item">
-		<a href="/blog/clangd-setup/" class="postlist-link">Clangd setup for CUDA.</a>
-		<time class="postlist-date" datetime="2025-09-26">September 2025</time>
-	</li>
-</ol>
+__global__ void kernelVarHunter(int* rGPU) {
+    int i = blockIdx.x;
+    int j = threadIdx.x;
+    foo(i, j, rGPU);
+}
 
+int main() {
+  int *result = (int *)malloc(10 * sizeof(int));
 
+  int *rGPU = NULL;
+  cudaMalloc((void **)&rGPU, 10 * sizeof(int));
 
+  kernelVarHunter<<<1, 10>>>(rGPU);
+  cudaMemcpy(result, rGPU, 10 * sizeof(int), cudaMemcpyDeviceToHost);
 
+  for (int i = 0; i < 10; i++) {
+    std::cout << result[i] << " ";
+  }
+}</iostream></code></pre>
+<p>Compile with nvcc, <code>nvcc foo.c -o foo</code> and run it <code>./foo</code>.</p>
+<pre><code># output
+0 1 2 3 4 5 6 7 8 9
+</code></pre>
+<p>100 Blocks, each having 128 threads</p>
+<pre class="language-c++" tabindex="0"><code class="language-c++">#include <iostream>
 
+__device__ void foo(int i, int j, int* rGPU) {
+    // j - 0 to 127 | i - 0 to 99
+    rGPU[j + 128*i] = j + 128 * i;
+}
 
+__global__ void kernelVarHunter(int* rGPU) {
+    int i = blockIdx.x;
+    int j = threadIdx.x;
+    foo(i, j, rGPU);
+}
 
+int main() {
+    int* result = (int *)malloc(12800*sizeof(int));
+    int* rGPU = NULL;
+    cudaMalloc((void **)&rGPU, 12800 * sizeof(int));
+    kernelVarHunter<<<100,128>>>(rGPU);
 
+    cudaMemcpy(result, rGPU, 12800 * sizeof(int), cudaMemcpyDeviceToHost);
+
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 128; j++) {
+            std::cout << result[j + i*128] << " ";
+        }
+        std::cout << std::endl;
+    }
+}</iostream></code></pre>
+<pre><code># output
+0 1 2 3 4 5 6 7 8 9 ... 127
+...
+...
+12672 12673 12674 ... 12799
+</code></pre>
+
+<ul class="links-nextprev"><li class="links-nextprev-prev">← Previous<br> <a href="/blog/clangd-setup/">Clangd setup for CUDA.</a></li>
+</ul>
 
 			</heading-anchors>
 		</main>
@@ -362,7 +583,7 @@ header {
 			</p>
 		</footer>
 
-		<!-- This page `/` was built on 2025-10-05T15:22:54.275Z -->
+		<!-- This page `/blog/03-cuda-builtin-vars/` was built on 2025-10-05T15:22:54.276Z -->
 		<script type="module" src="/dist/xbxy_EL6cU.js"></script>
 	</body>
 </html>

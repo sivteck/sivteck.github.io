@@ -5,11 +5,83 @@
   <subtitle>Blogging about stuff.</subtitle>
   <link href="https://sivteck.github.io/feed/feed.xml" rel="self" />
   <link href="https://sivteck.github.io/" />
-  <updated>2025-09-26T00:00:00Z</updated>
+  <updated>2025-10-05T00:00:00Z</updated>
   <id>https://sivteck.github.io/</id>
   <author>
     <name>Sivaram Balakrishnan</name>
   </author>
+  <entry>
+    <title>CUDA Basic Indexing</title>
+    <link href="https://sivteck.github.io/blog/03-cuda-builtin-vars/" />
+    <updated>2025-10-05T00:00:00Z</updated>
+    <id>https://sivteck.github.io/blog/03-cuda-builtin-vars/</id>
+    <content type="html">&lt;p&gt;Basic CUDA examples to understand indexing.&lt;/p&gt;
+&lt;p&gt;One Block, Ten Threads:&lt;/p&gt;
+&lt;pre class=&quot;language-c++&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;#include &lt;iostream&gt;
+__device__ void foo(int i, int j, int* rGPU) {
+    rGPU[i + j] = i + j;
+}
+
+__global__ void kernelVarHunter(int* rGPU) {
+    int i = blockIdx.x;
+    int j = threadIdx.x;
+    foo(i, j, rGPU);
+}
+
+int main() {
+  int *result = (int *)malloc(10 * sizeof(int));
+
+  int *rGPU = NULL;
+  cudaMalloc((void **)&amp;rGPU, 10 * sizeof(int));
+
+  kernelVarHunter&lt;&lt;&lt;1, 10&gt;&gt;&gt;(rGPU);
+  cudaMemcpy(result, rGPU, 10 * sizeof(int), cudaMemcpyDeviceToHost);
+
+  for (int i = 0; i &lt; 10; i++) {
+    std::cout &lt;&lt; result[i] &lt;&lt; &quot; &quot;;
+  }
+}&lt;/iostream&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Compile with nvcc, &lt;code&gt;nvcc foo.c -o foo&lt;/code&gt; and run it &lt;code&gt;./foo&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# output
+0 1 2 3 4 5 6 7 8 9
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;100 Blocks, each having 128 threads&lt;/p&gt;
+&lt;pre class=&quot;language-c++&quot; tabindex=&quot;0&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;#include &lt;iostream&gt;
+
+__device__ void foo(int i, int j, int* rGPU) {
+    // j - 0 to 127 | i - 0 to 99
+    rGPU[j + 128*i] = j + 128 * i;
+}
+
+__global__ void kernelVarHunter(int* rGPU) {
+    int i = blockIdx.x;
+    int j = threadIdx.x;
+    foo(i, j, rGPU);
+}
+
+int main() {
+    int* result = (int *)malloc(12800*sizeof(int));
+    int* rGPU = NULL;
+    cudaMalloc((void **)&amp;rGPU, 12800 * sizeof(int));
+    kernelVarHunter&lt;&lt;&lt;100,128&gt;&gt;&gt;(rGPU);
+
+    cudaMemcpy(result, rGPU, 12800 * sizeof(int), cudaMemcpyDeviceToHost);
+
+    for (int i = 0; i &lt; 100; i++) {
+        for (int j = 0; j &lt; 128; j++) {
+            std::cout &lt;&lt; result[j + i*128] &lt;&lt; &quot; &quot;;
+        }
+        std::cout &lt;&lt; std::endl;
+    }
+}&lt;/iostream&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;# output
+0 1 2 3 4 5 6 7 8 9 ... 127
+...
+...
+12672 12673 12674 ... 12799
+&lt;/code&gt;&lt;/pre&gt;
+</content>
+  </entry>
   <entry>
     <title>Clangd setup for CUDA.</title>
     <link href="https://sivteck.github.io/blog/clangd-setup/" />
