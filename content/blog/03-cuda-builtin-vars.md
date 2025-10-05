@@ -1,12 +1,11 @@
 ---
-title: CUDA Builtin variables and Indexing [WIP]
-description: Understanding threadIdx and blockIdx
-date: 2025-10-02
+title: CUDA Basic Indexing
+description: Understanding one dimensional indexes
+date: 2025-10-05
 tags: dev
-draft: true
 ---
 
-Basic CUDA examples to understand indexing
+Basic CUDA examples to understand indexing.
 
 One Block, Ten Threads:
 
@@ -85,37 +84,3 @@ int main() {
 ...
 12672 12673 12674 ... 12799
 ```
-
-Grid -> Block -> Thread
-
-blockDim represents dimensions of a block of threads.
-
-Can be three dimensional,
-```
-blockDim.x
-blockDim.y
-blockDim.z
-```
-
-blockIdx represents each unique block in a grid.
-```
-blockIdx.x
-blockIdx.y
-blockIdx.z
-```
-
-threadIdx gives a unique thread coordinate inside a block
-```
-threadIdx.x
-threadIdx.y
-threadIdx.z
-```
-
-Work Per Thread = Total Work/(Number Of Blocks * Threads Per Block)
-
-gridDim
-blockDim
-dim3
-blockIdx
-threadIdx
-divup
