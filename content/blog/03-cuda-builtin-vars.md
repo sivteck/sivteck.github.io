@@ -9,8 +9,8 @@ Basic CUDA examples to understand indexing.
 
 One Block, Ten Threads:
 
-```c++
-#include \<iostream\>
+```cpp
+#include <iostream>
 
 __device__ void foo(int i, int j, int* rGPU) {
     rGPU[i + j] = i + j;
@@ -47,8 +47,8 @@ Compile with nvcc, `nvcc foo.c -o foo` and run it `./foo`.
 
 100 Blocks, each having 128 threads
 
-```c++
-#include \<iostream\>
+```cpp
+#include <iostream>
 
 __device__ void foo(int i, int j, int* rGPU) {
     // j - 0 to 127 | i - 0 to 99
