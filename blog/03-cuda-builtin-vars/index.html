@@ -507,64 +507,64 @@ pre[class*="language-diff-"] {
 
 <p>Basic CUDA examples to understand indexing.</p>
 <p>One Block, Ten Threads:</p>
-<pre class="language-c++" tabindex="0"><code class="language-c++">#include \<iostream\>
+<pre class="language-cpp" tabindex="0"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
 
-__device__ void foo(int i, int j, int* rGPU) {
-    rGPU[i + j] = i + j;
-}
+__device__ <span class="token keyword">void</span> <span class="token function">foo</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token punctuation">,</span> <span class="token keyword">int</span> j<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> rGPU<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    rGPU<span class="token punctuation">[</span>i <span class="token operator">+</span> j<span class="token punctuation">]</span> <span class="token operator">=</span> i <span class="token operator">+</span> j<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-__global__ void kernelVarHunter(int* rGPU) {
-    int i = blockIdx.x;
-    int j = threadIdx.x;
-    foo(i, j, rGPU);
-}
+__global__ <span class="token keyword">void</span> <span class="token function">kernelVarHunter</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token operator">*</span> rGPU<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> i <span class="token operator">=</span> blockIdx<span class="token punctuation">.</span>x<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> j <span class="token operator">=</span> threadIdx<span class="token punctuation">.</span>x<span class="token punctuation">;</span>
+    <span class="token function">foo</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">,</span> rGPU<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-int main() {
-  int *result = (int *)malloc(10 * sizeof(int));
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">int</span> <span class="token operator">*</span>result <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">10</span> <span class="token operator">*</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  int *rGPU = NULL;
-  cudaMalloc((void **)&rGPU, 10 * sizeof(int));
+  <span class="token keyword">int</span> <span class="token operator">*</span>rGPU <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+  <span class="token function">cudaMalloc</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>rGPU<span class="token punctuation">,</span> <span class="token number">10</span> <span class="token operator">*</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  kernelVarHunter<<<1, 10>>>(rGPU);
-  cudaMemcpy(result, rGPU, 10 * sizeof(int), cudaMemcpyDeviceToHost);
+  kernelVarHunter<span class="token operator">&lt;&lt;</span><span class="token operator">&lt;</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token operator">>></span><span class="token operator">></span><span class="token punctuation">(</span>rGPU<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">cudaMemcpy</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> rGPU<span class="token punctuation">,</span> <span class="token number">10</span> <span class="token operator">*</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">,</span> cudaMemcpyDeviceToHost<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  for (int i = 0; i < 10; i++) {
-    std::cout << result[i] << " ";
-  }
-}</iostream\></code></pre>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> result<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;&lt;</span> <span class="token string">" "</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
 <p>Compile with nvcc, <code>nvcc foo.c -o foo</code> and run it <code>./foo</code>.</p>
 <pre><code># output
 0 1 2 3 4 5 6 7 8 9
 </code></pre>
 <p>100 Blocks, each having 128 threads</p>
-<pre class="language-c++" tabindex="0"><code class="language-c++">#include \<iostream\>
+<pre class="language-cpp" tabindex="0"><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>
 
-__device__ void foo(int i, int j, int* rGPU) {
-    // j - 0 to 127 | i - 0 to 99
-    rGPU[j + 128*i] = j + 128 * i;
-}
+__device__ <span class="token keyword">void</span> <span class="token function">foo</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token punctuation">,</span> <span class="token keyword">int</span> j<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> rGPU<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// j - 0 to 127 | i - 0 to 99</span>
+    rGPU<span class="token punctuation">[</span>j <span class="token operator">+</span> <span class="token number">128</span><span class="token operator">*</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> j <span class="token operator">+</span> <span class="token number">128</span> <span class="token operator">*</span> i<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-__global__ void kernelVarHunter(int* rGPU) {
-    int i = blockIdx.x;
-    int j = threadIdx.x;
-    foo(i, j, rGPU);
-}
+__global__ <span class="token keyword">void</span> <span class="token function">kernelVarHunter</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token operator">*</span> rGPU<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> i <span class="token operator">=</span> blockIdx<span class="token punctuation">.</span>x<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> j <span class="token operator">=</span> threadIdx<span class="token punctuation">.</span>x<span class="token punctuation">;</span>
+    <span class="token function">foo</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">,</span> rGPU<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-int main() {
-    int* result = (int *)malloc(12800*sizeof(int));
-    int* rGPU = NULL;
-    cudaMalloc((void **)&rGPU, 12800 * sizeof(int));
-    kernelVarHunter<<<100,128>>>(rGPU);
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span><span class="token operator">*</span> result <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token function">malloc</span><span class="token punctuation">(</span><span class="token number">12800</span><span class="token operator">*</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span><span class="token operator">*</span> rGPU <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token function">cudaMalloc</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>rGPU<span class="token punctuation">,</span> <span class="token number">12800</span> <span class="token operator">*</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    kernelVarHunter<span class="token operator">&lt;&lt;</span><span class="token operator">&lt;</span><span class="token number">100</span><span class="token punctuation">,</span><span class="token number">128</span><span class="token operator">>></span><span class="token operator">></span><span class="token punctuation">(</span>rGPU<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    cudaMemcpy(result, rGPU, 12800 * sizeof(int), cudaMemcpyDeviceToHost);
+    <span class="token function">cudaMemcpy</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> rGPU<span class="token punctuation">,</span> <span class="token number">12800</span> <span class="token operator">*</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">,</span> cudaMemcpyDeviceToHost<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 128; j++) {
-            std::cout << result[j + i*128] << " ";
-        }
-        std::cout << std::endl;
-    }
-}</iostream\></code></pre>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">100</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> <span class="token number">128</span><span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> result<span class="token punctuation">[</span>j <span class="token operator">+</span> i<span class="token operator">*</span><span class="token number">128</span><span class="token punctuation">]</span> <span class="token operator">&lt;&lt;</span> <span class="token string">" "</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        std<span class="token double-colon punctuation">::</span>cout <span class="token operator">&lt;&lt;</span> std<span class="token double-colon punctuation">::</span>endl<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
 <pre><code># output
 0 1 2 3 4 5 6 7 8 9 ... 127
 ...
@@ -584,7 +584,7 @@ int main() {
 			</p>
 		</footer>
 
-		<!-- This page `/blog/03-cuda-builtin-vars/` was built on 2025-11-01T06:01:45.665Z -->
+		<!-- This page `/blog/03-cuda-builtin-vars/` was built on 2025-11-01T06:12:43.013Z -->
 		<script type="module" src="/dist/xbxy_EL6cU.js"></script>
 	</body>
 </html>
