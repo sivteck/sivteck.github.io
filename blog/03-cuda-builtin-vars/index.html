@@ -507,7 +507,8 @@ pre[class*="language-diff-"] {
 
 <p>Basic CUDA examples to understand indexing.</p>
 <p>One Block, Ten Threads:</p>
-<pre class="language-c++" tabindex="0"><code class="language-c++">#include <iostream>
+<pre class="language-c++" tabindex="0"><code class="language-c++">#include \<iostream\>
+
 __device__ void foo(int i, int j, int* rGPU) {
     rGPU[i + j] = i + j;
 }
@@ -530,13 +531,13 @@ int main() {
   for (int i = 0; i < 10; i++) {
     std::cout << result[i] << " ";
   }
-}</iostream></code></pre>
+}</iostream\></code></pre>
 <p>Compile with nvcc, <code>nvcc foo.c -o foo</code> and run it <code>./foo</code>.</p>
 <pre><code># output
 0 1 2 3 4 5 6 7 8 9
 </code></pre>
 <p>100 Blocks, each having 128 threads</p>
-<pre class="language-c++" tabindex="0"><code class="language-c++">#include <iostream>
+<pre class="language-c++" tabindex="0"><code class="language-c++">#include \<iostream\>
 
 __device__ void foo(int i, int j, int* rGPU) {
     // j - 0 to 127 | i - 0 to 99
@@ -563,7 +564,7 @@ int main() {
         }
         std::cout << std::endl;
     }
-}</iostream></code></pre>
+}</iostream\></code></pre>
 <pre><code># output
 0 1 2 3 4 5 6 7 8 9 ... 127
 ...
@@ -583,7 +584,7 @@ int main() {
 			</p>
 		</footer>
 
-		<!-- This page `/blog/03-cuda-builtin-vars/` was built on 2025-10-05T15:22:54.276Z -->
+		<!-- This page `/blog/03-cuda-builtin-vars/` was built on 2025-11-01T06:01:45.665Z -->
 		<script type="module" src="/dist/xbxy_EL6cU.js"></script>
 	</body>
 </html>
