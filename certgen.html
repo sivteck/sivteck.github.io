@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Certificate Generator</title>
+
+  <!-- Libraries -->
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f7f9;
+      padding: 40px;
+    }
+    .box {
+      background: #fff;
+      padding: 30px;
+      max-width: 650px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    }
+    h2 {
+      margin-top: 0;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+    input {
+      margin-top: 8px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+    .list {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Certificate Generator</h2>
+
+  <label>Certificate Template (PDF)</label>
+  <input type="file" id="pdf" accept="application/pdf" />
+
+  <label>Candidate CSV (max 50 rows)</label>
+  <input type="file" id="csv" accept=".csv" />
+
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+const ALLOWED_TITLES = ["Mr.", "Ms.", "Mrs.", "Dr."]
+let templateBytes = null
+
+document.getElementById("pdf").addEventListener("change", async (e) => {
+  templateBytes = await e.target.files[0].arrayBuffer()
+})
+
+document.getElementById("csv").addEventListener("change", (e) => {
+  if (!templateBytes) {
+    alert("Please upload the certificate PDF first")
+    e.target.value = ""
+    return
+  }
+
+  Papa.parse(e.target.files[0], {
+    header: true,
+    skipEmptyLines: true,
+    complete: (result) => {
+      const rows = result.data
+
+      if (rows.length === 0) return alert("CSV is empty")
+      if (rows.length > 50) return alert("Maximum 50 certificates per batch")
+
+      for (const r of rows) {
+        if (!ALLOWED_TITLES.includes(r.title)) {
+          return alert(`Invalid title: ${r.title}`)
+        }
+        if (!r.name || !r.register_number || !r.address) {
+          return alert("CSV must include title, name, register_number, address")
+        }
+      }
+
+      renderButtons(rows)
+    }
+  })
+})
+
+function renderButtons(rows) {
+  const container = document.getElementById("list")
+  container.innerHTML = "<h3>Generate Certificate</h3>"
+
+  rows.forEach((row) => {
+    const btn = document.createElement("button")
+    btn.textContent = `${row.title} ${row.name} (${row.register_number})`
+    btn.onclick = () => generatePDF(row)
+    container.appendChild(btn)
+  })
+}
+
+async function generatePDF(row) {
+  const pdfDoc = await PDFLib.PDFDocument.load(templateBytes)
+  const page = pdfDoc.getPages()[0]
+
+  const bold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold)
+  const regular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica)
+
+  // PDF metadata (trust)
+  pdfDoc.setTitle("Certificate")
+  pdfDoc.setAuthor("Certificate Generator")
+  pdfDoc.setProducer("Internal Certificate Tool")
+
+
+const titleTickX = {
+  "Mr.": 290,
+  "Ms.": 314,
+  "Mrs.": 350,
+  "Dr.": 378 
+}
+
+const tickX = titleTickX[row.title]
+const tickY = 318
+
+page.drawLine({
+  start: { x: tickX, y: tickY },
+  end:   { x: tickX + 4, y: tickY - 6 },
+  thickness: 1.5
+})
+
+page.drawLine({
+  start: { x: tickX + 4, y: tickY - 6 },
+  end:   { x: tickX + 12, y: tickY + 6 },
+  thickness: 1.5
+})
+  
+ 
+
+  // TITLE + NAME (bold)
+// NAME (baseline slightly ABOVE underline)
+page.drawText(`${row.name}`, {
+  x: 398,
+  y: 301,   // ⬆ raised from underline
+  size: 18,
+  font: bold
+})
+
+// REGISTER NUMBER (baseline above underline)
+page.drawText(row.register_number, {
+  x: 284,
+  y: 274,   // ⬆ raised
+  size: 14,
+  font: regular
+})
+
+// ADDRESS (baseline above underline)
+page.drawText(row.address, {
+  x: 238,
+  y: 249,   // ⬆ raised
+  size: 14,
+  font: regular,
+  maxWidth: 330,
+  lineHeight: 16
+})
+  
+
+  const pdfBytes = await pdfDoc.save()
+
+  const filename =
+    `${row.title} ${row.name} (${row.register_number}).pdf`
+      .replace(/[<>:"/\\|?*]+/g, "")
+
+  saveAs(new Blob([pdfBytes], { type: "application/pdf" }), filename)
+}
+</script>
+
+</body>
+</html>
+
