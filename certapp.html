@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>PDF Certificate Builder</title>
 
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -11,16 +11,50 @@
 <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
 <style>
-body { font-family: Arial; background:#f5f5f5; padding:20px }
-#canvasWrapper { position:relative; display:inline-block }
-.field {
-  position:absolute;
-  border:1px dashed #007bff;
-  padding:4px;
-  cursor:move;
-  background:rgba(255,255,255,.8);
+body {
+  font-family: system-ui, sans-serif;
+  background: #f6f7f9;
+  padding: 24px;
 }
-.controls { margin-bottom:20px }
+.container {
+  display: flex;
+  gap: 24px;
+}
+.panel {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  width: 280px;
+}
+.panel h3 {
+  margin-top: 0;
+}
+button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+}
+input {
+  width: 100%;
+  margin-top: 6px;
+}
+#canvasWrapper {
+  position: relative;
+}
+.field {
+  position: absolute;
+  padding: 3px 6px;
+  border: 1px dashed #555;
+  background: rgba(255,255,255,0.85);
+  font-size: 12px;
+  cursor: move;
+}
+canvas {
+  border: 1px solid #ccc;
+}
+small {
+  color: #666;
+}
 </style>
 </head>
 
@@ -28,85 +62,117 @@ body { font-family: Arial; background:#f5f5f5; padding:20px }
 
 <h2>PDF Certificate Generator</h2>
 
-<div class="controls">
-  <input type="file" id="pdfInput" accept="application/pdf"><br><br>
-  <button onclick="addField()">Add Field</button>
-  <br><br>
-  Filename format:
-  <input id="filenameFormat" value="{email}.pdf" style="width:200px">
-  <br><br>
-  <input type="file" id="csvInput" accept=".csv">
-  <br><br>
-  <button onclick="generate()">Generate ZIP</button>
-</div>
+<div class="container">
 
-<div id="canvasWrapper">
-  <canvas id="pdfCanvas"></canvas>
+  <!-- LEFT PANEL -->
+  <div class="panel">
+    <h3>1. Template</h3>
+    <input type="file" id="pdfInput" accept="application/pdf">
+
+    <h3>2. Fields</h3>
+    <button onclick="addField()">+ Add Field</button>
+    <small>Field name must match CSV column</small>
+
+    <h3>3. CSV</h3>
+    <input type="file" id="csvInput" accept=".csv">
+
+    <h3>4. Filename</h3>
+    <input id="filenameFormat" value="{email}.pdf">
+    <small>Example: {email}.pdf</small>
+
+    <button onclick="generateZip()">Generate ZIP</button>
+  </div>
+
+  <!-- PDF PREVIEW -->
+  <div id="canvasWrapper">
+    <canvas id="pdfCanvas"></canvas>
+  </div>
+
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
 
-let templateBytes
-let pdfPage
-let scale = 1.5
+let previewBytes = null
+let generationBytes = null
+let scale = 1.4
 let fields = {}
 
 document.getElementById("pdfInput").addEventListener("change", async e => {
-  templateBytes = await e.target.files[0].arrayBuffer()
-  const pdf = await pdfjsLib.getDocument({data: templateBytes}).promise
-  pdfPage = await pdf.getPage(1)
-  const viewport = pdfPage.getViewport({ scale })
+  const file = e.target.files[0]
+  if (!file) return
+
+  // FIX: create two independent buffers
+  const buffer = await file.arrayBuffer()
+  previewBytes = buffer.slice(0)
+  generationBytes = buffer.slice(0)
+
+  const pdf = await pdfjsLib.getDocument({ data: previewBytes }).promise
+  const page = await pdf.getPage(1)
+  const viewport = page.getViewport({ scale })
+
   const canvas = document.getElementById("pdfCanvas")
   canvas.width = viewport.width
   canvas.height = viewport.height
-  await pdfPage.render({ canvasContext: canvas.getContext("2d"), viewport }).promise
+
+  await page.render({
+    canvasContext: canvas.getContext("2d"),
+    viewport
+  }).promise
 })
 
 function addField() {
-  const name = prompt("Field name (must match CSV column)")
-  if (!name) return
+  const name = prompt("Field name (CSV column)")
+  if (!name || fields[name]) return
+
   const div = document.createElement("div")
   div.className = "field"
   div.textContent = name
-  div.style.left = "50px"
-  div.style.top = "50px"
+  div.style.left = "40px"
+  div.style.top = "40px"
+
   makeDraggable(div)
   document.getElementById("canvasWrapper").appendChild(div)
-  fields[name] = { el: div, size: 16 }
+
+  fields[name] = { el: div, size: 14 }
 }
 
 function makeDraggable(el) {
-  let dx, dy
+  let offsetX, offsetY
   el.onmousedown = e => {
-    dx = e.offsetX
-    dy = e.offsetY
+    offsetX = e.offsetX
+    offsetY = e.offsetY
     document.onmousemove = ev => {
-      el.style.left = ev.pageX - dx - el.parentElement.offsetLeft + "px"
-      el.style.top = ev.pageY - dy - el.parentElement.offsetTop + "px"
+      el.style.left = ev.pageX - offsetX - el.parentElement.offsetLeft + "px"
+      el.style.top = ev.pageY - offsetY - el.parentElement.offsetTop + "px"
     }
     document.onmouseup = () => document.onmousemove = null
   }
 }
 
-async function generate() {
+async function generateZip() {
+  if (!generationBytes) return alert("Upload PDF first")
+
   const csvFile = document.getElementById("csvInput").files[0]
   if (!csvFile) return alert("Upload CSV")
 
   Papa.parse(csvFile, {
-    header:true,
+    header: true,
+    skipEmptyLines: true,
     complete: async res => {
       const zip = new JSZip()
+
       for (const row of res.data) {
-        const pdfDoc = await PDFLib.PDFDocument.load(templateBytes)
+        const pdfDoc = await PDFLib.PDFDocument.load(generationBytes)
         const page = pdfDoc.getPages()[0]
         const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica)
 
         for (const key in fields) {
           const el = fields[key].el
           const x = parseFloat(el.style.left)
-          const y = page.getHeight() - parseFloat(el.style.top) - 20
+          const y = page.getHeight() - parseFloat(el.style.top) - 10
+
           page.drawText(row[key] || "", {
             x, y,
             size: fields[key].size,
@@ -115,10 +181,17 @@ async function generate() {
         }
 
         let fname = document.getElementById("filenameFormat").value
-        for (const k in row) fname = fname.replaceAll(`{${k}}`, row[k])
+        for (const k in row) {
+          fname = fname.replaceAll(`{${k}}`, row[k])
+        }
+
         zip.file(fname, await pdfDoc.save())
       }
-      saveAs(await zip.generateAsync({type:"blob"}), "certificates.zip")
+
+      saveAs(
+        await zip.generateAsync({ type: "blob", compression: "DEFLATE" }),
+        "certificates.zip"
+      )
     }
   })
 }
@@ -126,3 +199,4 @@ async function generate() {
 
 </body>
 </html>
+
