@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PDF Certificate Builder</title>
+
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+<style>
+body { font-family: Arial; background:#f5f5f5; padding:20px }
+#canvasWrapper { position:relative; display:inline-block }
+.field {
+  position:absolute;
+  border:1px dashed #007bff;
+  padding:4px;
+  cursor:move;
+  background:rgba(255,255,255,.8);
+}
+.controls { margin-bottom:20px }
+</style>
+</head>
+
+<body>
+
+<h2>PDF Certificate Generator</h2>
+
+<div class="controls">
+  <input type="file" id="pdfInput" accept="application/pdf"><br><br>
+  <button onclick="addField()">Add Field</button>
+  <br><br>
+  Filename format:
+  <input id="filenameFormat" value="{email}.pdf" style="width:200px">
+  <br><br>
+  <input type="file" id="csvInput" accept=".csv">
+  <br><br>
+  <button onclick="generate()">Generate ZIP</button>
+</div>
+
+<div id="canvasWrapper">
+  <canvas id="pdfCanvas"></canvas>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js"
+
+let templateBytes
+let pdfPage
+let scale = 1.5
+let fields = {}
+
+document.getElementById("pdfInput").addEventListener("change", async e => {
+  templateBytes = await e.target.files[0].arrayBuffer()
+  const pdf = await pdfjsLib.getDocument({data: templateBytes}).promise
+  pdfPage = await pdf.getPage(1)
+  const viewport = pdfPage.getViewport({ scale })
+  const canvas = document.getElementById("pdfCanvas")
+  canvas.width = viewport.width
+  canvas.height = viewport.height
+  await pdfPage.render({ canvasContext: canvas.getContext("2d"), viewport }).promise
+})
+
+function addField() {
+  const name = prompt("Field name (must match CSV column)")
+  if (!name) return
+  const div = document.createElement("div")
+  div.className = "field"
+  div.textContent = name
+  div.style.left = "50px"
+  div.style.top = "50px"
+  makeDraggable(div)
+  document.getElementById("canvasWrapper").appendChild(div)
+  fields[name] = { el: div, size: 16 }
+}
+
+function makeDraggable(el) {
+  let dx, dy
+  el.onmousedown = e => {
+    dx = e.offsetX
+    dy = e.offsetY
+    document.onmousemove = ev => {
+      el.style.left = ev.pageX - dx - el.parentElement.offsetLeft + "px"
+      el.style.top = ev.pageY - dy - el.parentElement.offsetTop + "px"
+    }
+    document.onmouseup = () => document.onmousemove = null
+  }
+}
+
+async function generate() {
+  const csvFile = document.getElementById("csvInput").files[0]
+  if (!csvFile) return alert("Upload CSV")
+
+  Papa.parse(csvFile, {
+    header:true,
+    complete: async res => {
+      const zip = new JSZip()
+      for (const row of res.data) {
+        const pdfDoc = await PDFLib.PDFDocument.load(templateBytes)
+        const page = pdfDoc.getPages()[0]
+        const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica)
+
+        for (const key in fields) {
+          const el = fields[key].el
+          const x = parseFloat(el.style.left)
+          const y = page.getHeight() - parseFloat(el.style.top) - 20
+          page.drawText(row[key] || "", {
+            x, y,
+            size: fields[key].size,
+            font
+          })
+        }
+
+        let fname = document.getElementById("filenameFormat").value
+        for (const k in row) fname = fname.replaceAll(`{${k}}`, row[k])
+        zip.file(fname, await pdfDoc.save())
+      }
+      saveAs(await zip.generateAsync({type:"blob"}), "certificates.zip")
+    }
+  })
+}
+</script>
+
+</body>
+</html>
