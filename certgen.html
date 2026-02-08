@@ -58,8 +58,8 @@ async function generateZIP(rows) {
     const pdfDoc = await PDFLib.PDFDocument.load(templateBytes)
     const page = pdfDoc.getPages()[0]
 
-    const bold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold)
-    const regular = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica)
+    const bold = await pdfDoc.embedFont(PDFLib.StandardFonts.TimesRomanBold)
+    const regular = await pdfDoc.embedFont(PDFLib.StandardFonts.TimesRoman)
 
     // PDF metadata (trust)
     pdfDoc.setTitle("Certificate")
